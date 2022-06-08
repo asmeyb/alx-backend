@@ -1,20 +1,26 @@
-import kue from 'kue';
-import createPushNotificationsJobs from './8-job.js';
+const createPushNotificationsJobs = (jobs, queue) => {
+  if (!Array.isArray(jobs)) {
+    throw Error('Jobs is not an array');
+  }
+  jobs.forEach((job) => {
+    const jb = queue.create('push_notification_code_3', job);
 
-const queue = kue.createQueue();
+    jb.save((err) => {
+      if (!err) console.log(`Notification job created: ${jb.id}`);
+    });
 
-const list = [
-    {
-      phoneNumber: '4153518780',
-      message: 'This is the code 1234 to verify your account'
-    }
-];
+    jb.on('complete', () => {
+      console.log(`Notification job ${jb.id} completed`);
+    });
 
-before(() => queue.testMode.enter());
-afterEach(() => queue.testMode.clear());
-after(() => queue.testMode.exit());
+    jb.on('failed', (err) => {
+      console.log(`Notification job ${jb.id} failed: ${err}`);
+    });
 
-it('does something cool', () => { 
-  createPushNotificationsJobs(list, queue);
-  expect(queue.testMode.jobs.type).to.equal(Array);
-});
+    jb.on('progress', (progress) => {
+      console.log(`Notification job ${jb.id} ${progress}% complete`);
+    });
+  });
+};
+
+export default createPushNotificationsJobs;

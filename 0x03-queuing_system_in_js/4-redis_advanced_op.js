@@ -1,24 +1,32 @@
-import redis from 'redis';
-const client = redis.createClient();
+import redis, {
+  createClient,
+} from 'redis';
 
-client.on("error", (error) => {
-    if (error) console.log(`Redis client not connected to the server: ${error}`)
-  }).on('ready', () => {
-      console.log('Redis client connected to the server');
+const client = createClient();
+
+(async () => {
+  client.on('error', (err) => {
+    console.log(`Redis client not connected to the server: ${err}`);
   });
 
-const name = 'HolbertonSchools';
-const values = {'Portland': 50,
-               'Seattle': 80,
-               'New York': 20,
-               'Bogota': 20,
-               'Cali': 40,
-               'Paris': 2}
+  client.on('connect', () => {
+    console.log('Redis client connected to the server');
+  });
+})();
 
-for (const [key, val] of Object.entries(values)) {
-  client.hset(name, key, val, (error, reply) =>
-    redis.print((`Reply: ${reply}`))
-  );
+const schools = {
+  Portland: 50,
+  Seattle: 80,
+  'New York': 20,
+  Bogota: 20,
+  Cali: 40,
+  Paris: 2,
+};
+for (const [key, value] of Object.entries(schools)) {
+  client.hset('HolbertonSchools', key, value, redis.print);
 }
 
-client.hgetall(name, (error, object) => console.log(object));
+client.hgetall('HolbertonSchools', (err, obj) => {
+  if (err) throw err;
+  console.log(obj);
+});

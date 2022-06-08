@@ -1,59 +1,70 @@
-import kue from 'kue';
+import {
+  createQueue,
+} from 'kue';
 
-const jobs =  [{
+const jobs = [
+  {
     phoneNumber: '4153518780',
-    message: 'This is the code 1234 to verify your account'
+    message: 'This is the code 1234 to verify your account',
   },
   {
     phoneNumber: '4153518781',
-    message: 'This is the code 4562 to verify your account'
+    message: 'This is the code 4562 to verify your account',
   },
   {
     phoneNumber: '4153518743',
-    message: 'This is the code 4321 to verify your account'
+    message: 'This is the code 4321 to verify your account',
   },
   {
     phoneNumber: '4153538781',
-    message: 'This is the code 4562 to verify your account'
+    message: 'This is the code 4562 to verify your account',
   },
   {
     phoneNumber: '4153118782',
-    message: 'This is the code 4321 to verify your account'
+    message: 'This is the code 4321 to verify your account',
   },
   {
     phoneNumber: '4153718781',
-    message: 'This is the code 4562 to verify your account'
+    message: 'This is the code 4562 to verify your account',
   },
   {
     phoneNumber: '4159518782',
-    message: 'This is the code 4321 to verify your account'
+    message: 'This is the code 4321 to verify your account',
   },
   {
     phoneNumber: '4158718781',
-    message: 'This is the code 4562 to verify your account'
+    message: 'This is the code 4562 to verify your account',
   },
   {
     phoneNumber: '4153818782',
-    message: 'This is the code 4321 to verify your account'
+    message: 'This is the code 4321 to verify your account',
   },
   {
     phoneNumber: '4154318781',
-    message: 'This is the code 4562 to verify your account'
+    message: 'This is the code 4562 to verify your account',
   },
   {
     phoneNumber: '4151218782',
-    message: 'This is the code 4321 to verify your account'
-  }
+    message: 'This is the code 4321 to verify your account',
+  },
 ];
 
-const queue = kue.createQueue();
+const queue = createQueue();
 
-for (const j of jobs) {
-  const job = queue.create('push_notification_code', j)
-  .save((error) => {
-    if (!error) console.log(`Notification job created: ${job.id}`);
+jobs.forEach((job) => {
+  const jb = queue.create('push_notification_code_2', job).save((err) => {
+    if (!err) console.log(`Notification job created: JOB_ID: ${jb.id}`);
   });
-  job.on('complete', () => console.log(`Notification job ${job.id} completed`));
-  job.on('failed', (error) => console.log(`Notification job ${job.id} failed: ${error}`));
-  job.on('progress', (progress) => console.log(`Notification job ${job.id} ${progress}% complete`));
-}
+
+  jb.on('complete', () => {
+    console.log(`Notification job ${jb.id} completed`);
+  });
+
+  jb.on('failed', (err) => {
+    console.log(`Notification job ${jb.id} failed: ${err}`);
+  });
+
+  jb.on('progress', (progress) => {
+    console.log(`Notification job ${jb.id} ${progress}% complete`);
+  });
+});
